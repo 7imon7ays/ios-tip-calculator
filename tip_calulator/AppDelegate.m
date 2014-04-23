@@ -7,8 +7,8 @@
 //
 
 #import "AppDelegate.h"
-//#import "TipViewController.h"
-#import "UsersViewController.h"
+#import "TipViewController.h"
+//#import "UsersViewController.h"
 
 @implementation AppDelegate
 
@@ -16,11 +16,12 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-    //TipViewController *tipViewController = [[TipViewController alloc] init];
-    //self.window.rootViewController = tipViewController;
+    TipViewController *tipViewController = [[TipViewController alloc] init];
     
-    UsersViewController *usersViewController = [[UsersViewController alloc] init];
-    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:usersViewController];
+    //UsersViewController *usersViewController = [[UsersViewController alloc] init];
+//    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:usersViewController];
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:tipViewController];
+    
     self.window.rootViewController = navigationController;
     
     self.window.backgroundColor = [UIColor whiteColor];
