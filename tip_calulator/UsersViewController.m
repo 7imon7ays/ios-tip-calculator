@@ -7,13 +7,15 @@
 //
 
 #import "UsersViewController.h"
+#import "MovieCell.h"
+#import "UIImageView+AFNetworking.h"
 
 @interface UsersViewController ()
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 
 @property (nonatomic, strong) NSArray *names;
-
+@property (nonatomic, strong) NSArray *movies;
 
 @end
 
@@ -24,7 +26,6 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.names = @[@"Tim", @"Chunyan", @"Andrew", @"Malena"];
         
         self.title = @"Names";
     }
@@ -35,8 +36,22 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    
+    NSString *url = @"http://api.rottentomatoes.com/api/public/v1.0/lists/movies/box_office.json?apikey=g9au4hv6khv6wzvzgt55gpqs";
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+        id object = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+        self.movies = object[@"movies"];
+        [self.tableView reloadData];
+    }];
+    
+    self.tableView.rowHeight = 134;
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
+    
+    [self.tableView registerNib:[UINib nibWithNibName:@"MovieCell" bundle:nil] forCellReuseIdentifier:@"MovieCell"];
+    
 }
 
 - (void)didReceiveMemoryWarning
@@ -46,14 +61,19 @@
 }
 
 - (NSInteger)tableView: (UITableView *) tableView numberOfRowsInSection:(NSInteger)section {
-    return self.names.count;
+    return self.movies.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+    MovieCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MovieCell"];
     
-    NSString *name = self.names[indexPath.row];
-    cell.textLabel.text = name;
+    NSDictionary *movie = self.movies[indexPath.row];
+    NSDictionary *posters = movie[@"posters"];
+    NSString *posterUrl = posters[@"detailed"];
+    
+    cell.movieTitleLabel.text = movie[@"title"];
+    cell.synopsisLabel.text = movie[@"synopsis"];
+    [cell.posterView setImageWithURL: [NSURL URLWithString: posterUrl]];
 
     return cell;
 }
@@ -61,8 +81,6 @@
 - (void)tableView:(UITableView *) tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    NSString *name = self.names[indexPath.row];
-        NSLog(@"You selected %@.", name);
 }
 
 @end
